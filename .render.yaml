@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: milsabores-api
+    env: java
+    buildCommand: ./mvnw clean install -DskipTests
+    startCommand: java -jar target/milsabores-api-0.0.1-SNAPSHOT.jar
+    plan: free
+    region: oregon
+    branch: main
