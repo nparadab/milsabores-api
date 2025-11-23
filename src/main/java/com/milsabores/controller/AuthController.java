@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -33,9 +34,36 @@ public class AuthController {
         return ResponseEntity.ok(service.login(request));
     }
 
-    // ✅ Nuevo endpoint para verificar usuarios guardados en la BD
+    // ✅ Listar todos los usuarios
     @GetMapping("/usuarios")
     public ResponseEntity<List<Usuario>> listarUsuarios() {
         return ResponseEntity.ok(usuarioRepository.findAll());
+    }
+
+    // ✅ Eliminar usuario por ID
+    @DeleteMapping("/usuarios/{id}")
+    public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
+        if (!usuarioRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        usuarioRepository.deleteById(id);
+        return ResponseEntity.ok("Usuario eliminado correctamente");
+    }
+
+    // ✅ Modificar usuario por ID
+    @PutMapping("/usuarios/{id}")
+    public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioActualizado) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        usuario.setNombre(usuarioActualizado.getNombre());
+        usuario.setEmail(usuarioActualizado.getEmail());
+        usuario.setRol(usuarioActualizado.getRol());
+
+        usuarioRepository.save(usuario);
+        return ResponseEntity.ok(usuario);
     }
 }
