@@ -21,11 +21,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.jwtUtil = jwtUtil;
     }
 
-    // ✅ Evitar aplicar el filtro a rutas públicas
+    // ✅ Evitar aplicar el filtro a rutas públicas como /api/auth/*
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.startsWith("/api/auth"); // no aplicar filtro a /api/auth/*
+        return path.matches("^/api/auth(/.*)?$");
     }
 
     @Override
