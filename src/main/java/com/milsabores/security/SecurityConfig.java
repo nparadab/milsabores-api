@@ -30,9 +30,10 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Público: registro y login
+                // Público: registro, login y Swagger
                 .requestMatchers("/api/auth/register", "/api/auth/login",
-                                 "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+                                 "/api/v1/auth/register", "/api/v1/auth/login",
+                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
                 // CRUD de usuarios: solo ADMIN
                 .requestMatchers("/api/auth/usuarios/**", "/api/v1/auth/usuarios/**").hasRole("ADMIN")
@@ -72,3 +73,4 @@ public class SecurityConfig {
         return source;
     }
 }
+
