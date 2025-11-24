@@ -24,6 +24,12 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
+    // ✅ Método auxiliar para encriptar contraseñas
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
+    // ✅ Registro de usuario
     public AuthResponse register(RegisterRequest request) {
         usuarioRepository.findByEmail(request.getEmail())
                 .ifPresent(u -> { throw new RuntimeException("Email ya registrado"); });
@@ -31,7 +37,7 @@ public class AuthService {
         Usuario u = new Usuario();
         u.setNombre(request.getNombre());
         u.setEmail(request.getEmail());
-        u.setPassword(passwordEncoder.encode(request.getPassword()));
+        u.setPassword(passwordEncoder.encode(request.getPassword())); // encriptar
         u.setRol(request.getRol());
         usuarioRepository.save(u);
 
@@ -42,6 +48,7 @@ public class AuthService {
         return new AuthResponse(token);
     }
 
+    // ✅ Login de usuario
     public AuthResponse login(AuthRequest request) {
         Usuario u = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -57,3 +64,4 @@ public class AuthService {
         return new AuthResponse(token);
     }
 }
+
