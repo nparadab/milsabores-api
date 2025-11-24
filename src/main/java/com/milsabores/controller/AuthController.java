@@ -24,33 +24,39 @@ public class AuthController {
         this.usuarioRepository = usuarioRepository;
     }
 
+    // 🔐 Registro público (siempre CLIENTE)
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+        // Forzar rol CLIENTE en el registro público
+        request.setRol("CLIENTE");
         return ResponseEntity.ok(service.register(request));
     }
 
+    // 🔐 Login
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         return ResponseEntity.ok(service.login(request));
     }
 
-    // ✅ Listar todos los usuarios
+    // 👥 Listar todos los usuarios (ADMIN)
     @GetMapping("/usuarios")
     public ResponseEntity<List<Usuario>> listarUsuarios() {
         return ResponseEntity.ok(usuarioRepository.findAll());
     }
 
-    // ✅ Eliminar usuario por ID
-    @DeleteMapping("/usuarios/{id}")
-    public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
-        if (!usuarioRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        usuarioRepository.deleteById(id);
-        return ResponseEntity.ok("Usuario eliminado correctamente");
+    // 👥 Crear usuario desde panel admin (ADMIN)
+    @PostMapping("/usuarios")
+    public ResponseEntity<Usuario> crearUsuario(@RequestBody RegisterRequest request) {
+        Usuario u = new Usuario();
+        u.setNombre(request.getNombre());
+        u.setEmail(request.getEmail());
+        u.setPassword(service.encodePassword(request.getPassword())); // usar PasswordEncoder
+        u.setRol(request.getRol());
+        usuarioRepository.save(u);
+        return ResponseEntity.ok(u);
     }
 
-    // ✅ Modificar usuario por ID
+    // 👥 Modificar usuario por ID (ADMIN)
     @PutMapping("/usuarios/{id}")
     public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioActualizado) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
@@ -66,4 +72,15 @@ public class AuthController {
         usuarioRepository.save(usuario);
         return ResponseEntity.ok(usuario);
     }
+
+    // 👥 Eliminar usuario por ID (ADMIN)
+    @DeleteMapping("/usuarios/{id}")
+    public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
+        if (!usuarioRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        usuarioRepository.deleteById(id);
+        return ResponseEntity.ok("Usuario eliminado correctamente");
+    }
 }
+
