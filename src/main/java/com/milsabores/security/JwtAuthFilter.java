@@ -21,11 +21,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.jwtUtil = jwtUtil;
     }
 
-    // ✅ Evitar aplicar el filtro a rutas públicas como /api/auth/* y Swagger
+    // ✅ Excluir solo login, register y Swagger
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.matches("^/api/auth(/.*)?$")
+        return path.equals("/api/auth/login")
+            || path.equals("/api/auth/register")
             || path.startsWith("/swagger-ui")
             || path.startsWith("/v3/api-docs");
     }
@@ -55,3 +56,4 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
+
