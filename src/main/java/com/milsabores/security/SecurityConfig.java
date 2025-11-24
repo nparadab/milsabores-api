@@ -30,26 +30,21 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Público: registro, login y Swagger
-                .requestMatchers("/api/auth/register", "/api/auth/login",
-                                 "/api/v1/auth/register", "/api/v1/auth/login",
-                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                // Público: login, registro y Swagger
+                .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
-                // CRUD de usuarios: solo ADMIN
-                .requestMatchers("/api/auth/usuarios/**", "/api/v1/auth/usuarios/**").hasRole("ADMIN")
+                // Usuarios: solo ADMIN
+                .requestMatchers("/api/auth/usuarios/**").hasRole("ADMIN")
 
                 // Productos y categorías
-                .requestMatchers(HttpMethod.GET, "/api/productos/**", "/api/categorias/**",
-                                 "/api/v1/productos/**", "/api/v1/categorias/**").hasAnyRole("ADMIN", "CLIENTE")
-                .requestMatchers(HttpMethod.POST, "/api/productos/**", "/api/categorias/**",
-                                 "/api/v1/productos/**", "/api/v1/categorias/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/productos/**", "/api/categorias/**",
-                                 "/api/v1/productos/**", "/api/v1/categorias/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/productos/**", "/api/categorias/**",
-                                 "/api/v1/productos/**", "/api/v1/categorias/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/productos/**", "/api/categorias/**").hasAnyRole("ADMIN", "CLIENTE")
+                .requestMatchers(HttpMethod.POST, "/api/productos/**", "/api/categorias/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/productos/**", "/api/categorias/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/productos/**", "/api/categorias/**").hasRole("ADMIN")
 
                 // Pedidos
-                .requestMatchers("/api/pedidos/**", "/api/v1/pedidos/**").hasAnyRole("ADMIN", "CLIENTE")
+                .requestMatchers("/api/pedidos/**").hasAnyRole("ADMIN", "CLIENTE")
 
                 // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
@@ -73,4 +68,5 @@ public class SecurityConfig {
         return source;
     }
 }
+
 
