@@ -16,7 +16,7 @@
     <artifactId>milsabores-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>milsabores-api</name>
-    <description>Demo project for Spring Boot</description>
+    <description>Proyecto Mil Sabores API con Spring Boot</description>
 
     <properties>
         <java.version>21</java.version>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.6.0</version>
+            <version>2.5.0</version>
         </dependency>
 
         <!-- Validación -->
@@ -107,10 +107,13 @@
 
     <build>
         <plugins>
+            <!-- Compilador configurado para Java 21 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
                 <configuration>
+                    <release>21</release>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -120,6 +123,8 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
+            <!-- Plugin de Spring Boot -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -127,3 +132,4 @@
         </plugins>
     </build>
 </project>
+
