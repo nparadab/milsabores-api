@@ -27,15 +27,30 @@ public class SecurityConfig {
         JwtAuthFilter jwtFilter = new JwtAuthFilter(jwtUtil);
 
         http
-            .cors(Customizer.withDefaults()) // ✅ habilitar CORS
+            .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/productos/**", "/api/categorias/**").hasAnyRole("ADMIN", "CLIENTE")
-                .requestMatchers(HttpMethod.POST, "/api/productos/**", "/api/categorias/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/productos/**", "/api/categorias/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/productos/**", "/api/categorias/**").hasRole("ADMIN")
-                .requestMatchers("/api/pedidos/**").hasAnyRole("ADMIN", "CLIENTE")
+                // Público: registro y login
+                .requestMatchers("/api/auth/register", "/api/auth/login",
+                                 "/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+
+                // CRUD de usuarios: solo ADMIN
+                .requestMatchers("/api/auth/usuarios/**", "/api/v1/auth/usuarios/**").hasRole("ADMIN")
+
+                // Productos y categorías
+                .requestMatchers(HttpMethod.GET, "/api/productos/**", "/api/categorias/**",
+                                 "/api/v1/productos/**", "/api/v1/categorias/**").hasAnyRole("ADMIN", "CLIENTE")
+                .requestMatchers(HttpMethod.POST, "/api/productos/**", "/api/categorias/**",
+                                 "/api/v1/productos/**", "/api/v1/categorias/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/productos/**", "/api/categorias/**",
+                                 "/api/v1/productos/**", "/api/v1/categorias/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/productos/**", "/api/categorias/**",
+                                 "/api/v1/productos/**", "/api/v1/categorias/**").hasRole("ADMIN")
+
+                // Pedidos
+                .requestMatchers("/api/pedidos/**", "/api/v1/pedidos/**").hasAnyRole("ADMIN", "CLIENTE")
+
+                // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -44,11 +59,10 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ✅ Configuración CORS para permitir peticiones desde tu frontend
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000", "https://mil-sabores-frontend.onrender.com")); // ajusta si usas frontend en Render
+        config.setAllowedOrigins(List.of("http://localhost:3000", "https://mil-sabores-frontend.onrender.com"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
