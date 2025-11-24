@@ -24,11 +24,9 @@ public class AuthController {
         this.usuarioRepository = usuarioRepository;
     }
 
-    // 🔐 Registro público (siempre CLIENTE)
+    // 🔐 Registro público
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-        // Forzar rol CLIENTE en el registro público
-        request.setRol("CLIENTE");
         return ResponseEntity.ok(service.register(request));
     }
 
@@ -42,18 +40,6 @@ public class AuthController {
     @GetMapping("/usuarios")
     public ResponseEntity<List<Usuario>> listarUsuarios() {
         return ResponseEntity.ok(usuarioRepository.findAll());
-    }
-
-    // 👥 Crear usuario desde panel admin (ADMIN)
-    @PostMapping("/usuarios")
-    public ResponseEntity<Usuario> crearUsuario(@RequestBody RegisterRequest request) {
-        Usuario u = new Usuario();
-        u.setNombre(request.getNombre());
-        u.setEmail(request.getEmail());
-        u.setPassword(service.encodePassword(request.getPassword())); // usar PasswordEncoder
-        u.setRol(request.getRol());
-        usuarioRepository.save(u);
-        return ResponseEntity.ok(u);
     }
 
     // 👥 Modificar usuario por ID (ADMIN)
