@@ -35,7 +35,10 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
                 // 👥 Usuarios solo ADMIN
-                .requestMatchers("/api/auth/usuarios/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/auth/usuarios/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/auth/usuarios/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/auth/usuarios/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/auth/usuarios/**").hasRole("ADMIN")
 
                 // 👁️ Productos y categorías
                 .requestMatchers(HttpMethod.GET, "/api/productos/**", "/api/categorias/**").hasAnyRole("ADMIN", "CLIENTE")
@@ -71,5 +74,4 @@ public class SecurityConfig {
         return source;
     }
 }
-
 
