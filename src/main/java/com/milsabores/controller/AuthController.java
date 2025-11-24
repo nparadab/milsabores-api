@@ -7,6 +7,7 @@ import com.milsabores.model.Usuario;
 import com.milsabores.service.AuthService;
 import com.milsabores.repository.UsuarioRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,10 +19,12 @@ public class AuthController {
 
     private final AuthService service;
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthController(AuthService service, UsuarioRepository usuarioRepository) {
+    public AuthController(AuthService service, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.service = service;
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // 🔐 Registro público
@@ -42,6 +45,15 @@ public class AuthController {
         return ResponseEntity.ok(usuarioRepository.findAll());
     }
 
+    // 👥 Crear usuario (ADMIN)
+    @PostMapping("/usuarios")
+    public ResponseEntity<Usuario> crearUsuario(@RequestBody Usuario usuario) {
+        // encriptar contraseña antes de guardar
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        Usuario nuevo = usuarioRepository.save(usuario);
+        return ResponseEntity.ok(nuevo);
+    }
+
     // 👥 Modificar usuario por ID (ADMIN)
     @PutMapping("/usuarios/{id}")
     public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioActualizado) {
@@ -54,6 +66,11 @@ public class AuthController {
         usuario.setNombre(usuarioActualizado.getNombre());
         usuario.setEmail(usuarioActualizado.getEmail());
         usuario.setRol(usuarioActualizado.getRol());
+
+        // si viene contraseña nueva, encriptarla
+        if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isBlank()) {
+            usuario.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
+        }
 
         usuarioRepository.save(usuario);
         return ResponseEntity.ok(usuario);
