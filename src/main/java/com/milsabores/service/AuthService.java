@@ -31,7 +31,7 @@ public class AuthService {
 
     // ✅ Registro de usuario
     public AuthResponse register(RegisterRequest request) {
-        usuarioRepository.findByEmail(request.getEmail())
+        usuarioRepository.findByEmailIgnoreCase(request.getEmail())
                 .ifPresent(u -> { throw new RuntimeException("Email ya registrado"); });
 
         Usuario u = new Usuario();
@@ -50,7 +50,7 @@ public class AuthService {
 
     // ✅ Login de usuario
     public AuthResponse login(AuthRequest request) {
-        Usuario u = usuarioRepository.findByEmail(request.getEmail())
+        Usuario u = usuarioRepository.findByEmailIgnoreCase(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (!passwordEncoder.matches(request.getPassword(), u.getPassword())) {
