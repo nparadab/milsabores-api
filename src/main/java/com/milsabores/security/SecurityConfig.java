@@ -28,23 +28,17 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ habilitar CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 // 🔓 Registro, login y Swagger sin token
                 .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
                 // 👥 Usuarios solo ADMIN
-                .requestMatchers(HttpMethod.GET, "/api/auth/usuarios/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/auth/usuarios/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/auth/usuarios/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/auth/usuarios/**").hasRole("ADMIN")
+                .requestMatchers("/api/auth/usuarios/**").hasRole("ADMIN")
 
-                // 👁️ Productos y categorías
-                .requestMatchers(HttpMethod.GET, "/api/productos/**", "/api/categorias/**").hasAnyRole("ADMIN", "CLIENTE")
-                .requestMatchers(HttpMethod.POST, "/api/productos/**", "/api/categorias/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/productos/**", "/api/categorias/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/productos/**", "/api/categorias/**").hasRole("ADMIN")
+                // 👁️ Productos y categorías — ahora públicos
+                .requestMatchers("/api/productos/**", "/api/categorias/**").permitAll()
 
                 // 📦 Pedidos accesibles por ambos
                 .requestMatchers("/api/pedidos/**").hasAnyRole("ADMIN", "CLIENTE")
@@ -58,12 +52,9 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ✅ Configuración CORS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // Permitir tu frontend local y cualquier otro dominio que necesites
         configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://milsabores-api.onrender.com"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
