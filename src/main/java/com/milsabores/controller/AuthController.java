@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api") // ✅ Ruta corregida
 public class AuthController {
 
     private final AuthService service;
@@ -28,13 +28,13 @@ public class AuthController {
     }
 
     // 🔐 Registro público
-    @PostMapping("/register")
+    @PostMapping("/auth/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(service.register(request));
     }
 
-    // 🔐 Login
-    @PostMapping("/login")
+    // 🔐 Login público
+    @PostMapping("/auth/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         return ResponseEntity.ok(service.login(request));
     }
@@ -48,7 +48,6 @@ public class AuthController {
     // 👥 Crear usuario (ADMIN)
     @PostMapping("/usuarios")
     public ResponseEntity<Usuario> crearUsuario(@RequestBody Usuario usuario) {
-        // encriptar contraseña antes de guardar
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         Usuario nuevo = usuarioRepository.save(usuario);
         return ResponseEntity.ok(nuevo);
@@ -67,7 +66,6 @@ public class AuthController {
         usuario.setEmail(usuarioActualizado.getEmail());
         usuario.setRol(usuarioActualizado.getRol());
 
-        // si viene contraseña nueva, encriptarla
         if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isBlank()) {
             usuario.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
         }
@@ -86,4 +84,5 @@ public class AuthController {
         return ResponseEntity.ok("Usuario eliminado correctamente");
     }
 }
+
 
