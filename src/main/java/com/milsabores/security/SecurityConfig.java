@@ -30,18 +30,27 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                // 🔓 Registro, login y Swagger sin token
+
+                // 🔓 Público
                 .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
-                // ✅ Usuarios solo ADMIN (ruta correcta)
+                // 👑 ADMIN — gestión completa
                 .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/productos/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/productos/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasRole("ADMIN")
 
-                // 👁️ Productos y categorías — públicos
-                .requestMatchers("/api/productos/**", "/api/categorias/**").permitAll()
+                // 🧁 VENDEDOR — ver y editar productos, pero NO usuarios
+                .requestMatchers(HttpMethod.POST, "/api/productos/**").hasAnyRole("ADMIN", "VENDEDOR")
+                .requestMatchers(HttpMethod.PUT, "/api/productos/**").hasAnyRole("ADMIN", "VENDEDOR")
 
-                // 📦 Pedidos accesibles por ambos
-                .requestMatchers("/api/pedidos/**").hasAnyRole("ADMIN", "CLIENTE")
+                // 👤 CLIENTE — solo ver productos
+                .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+
+                // 🟦 SUPERVISOR — solo ver productos y categorías
+                .requestMatchers(HttpMethod.GET, "/api/productos/**").hasAnyRole("ADMIN", "VENDEDOR", "CLIENTE", "SUPERVISOR")
+                .requestMatchers("/api/categorias/**").hasAnyRole("ADMIN", "VENDEDOR", "CLIENTE", "SUPERVISOR")
 
                 // 🔐 Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
