@@ -27,13 +27,13 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // 🔐 Registro público
+    // ✅ Registro
     @PostMapping("/auth/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(service.register(request));
     }
 
-    // 🔐 Login público
+    // ✅ Login
     @PostMapping("/auth/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         return ResponseEntity.ok(service.login(request));
@@ -52,7 +52,7 @@ public class AuthController {
 
         Usuario usuario = usuarioOpt.get();
 
-        // ✅ Generar contraseña temporal segura
+        // ✅ Generar contraseña temporal
         String tempPassword = "Temp" + (int)(Math.random() * 9000 + 1000);
 
         // ✅ Guardarla encriptada
@@ -67,13 +67,13 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    // 👥 Listar todos los usuarios (ADMIN)
+    // ✅ Listar usuarios (ADMIN)
     @GetMapping("/usuarios")
     public ResponseEntity<List<Usuario>> listarUsuarios() {
         return ResponseEntity.ok(usuarioRepository.findAll());
     }
 
-    // 👥 Crear usuario (ADMIN)
+    // ✅ Crear usuario (ADMIN)
     @PostMapping("/usuarios")
     public ResponseEntity<Usuario> crearUsuario(@RequestBody Usuario usuario) {
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
@@ -81,7 +81,7 @@ public class AuthController {
         return ResponseEntity.ok(nuevo);
     }
 
-    // 👥 Modificar usuario por ID (ADMIN)
+    // ✅ Actualizar usuario (ADMIN)
     @PutMapping("/usuarios/{id}")
     public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioActualizado) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
@@ -102,7 +102,7 @@ public class AuthController {
         return ResponseEntity.ok(usuario);
     }
 
-    // 👥 Eliminar usuario por ID (ADMIN)
+    // ✅ Eliminar usuario (ADMIN)
     @DeleteMapping("/usuarios/{id}")
     public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
         if (!usuarioRepository.existsById(id)) {
@@ -112,4 +112,5 @@ public class AuthController {
         return ResponseEntity.ok("Usuario eliminado correctamente");
     }
 }
+
 
