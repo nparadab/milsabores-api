@@ -6,15 +6,15 @@ import com.milsabores.dto.RegisterRequest;
 import com.milsabores.model.Usuario;
 import com.milsabores.service.AuthService;
 import com.milsabores.repository.UsuarioRepository;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
-@RequestMapping("/api") // ✅ Ruta corregida
+@RequestMapping("/api")
 public class AuthController {
 
     private final AuthService service;
@@ -37,6 +37,34 @@ public class AuthController {
     @PostMapping("/auth/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         return ResponseEntity.ok(service.login(request));
+    }
+
+    // ✅ Recuperar contraseña (público)
+    @PostMapping("/auth/recuperar")
+    public ResponseEntity<?> recuperarPassword(@RequestBody Map<String, String> request) {
+
+        String email = request.get("email");
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("No existe un usuario con ese correo");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        // ✅ Generar contraseña temporal segura
+        String tempPassword = "Temp" + (int)(Math.random() * 9000 + 1000);
+
+        // ✅ Guardarla encriptada
+        usuario.setPassword(passwordEncoder.encode(tempPassword));
+        usuarioRepository.save(usuario);
+
+        // ✅ Respuesta JSON
+        Map<String, String> response = new HashMap<>();
+        response.put("mensaje", "Contraseña temporal generada");
+        response.put("passwordTemporal", tempPassword);
+
+        return ResponseEntity.ok(response);
     }
 
     // 👥 Listar todos los usuarios (ADMIN)
@@ -84,5 +112,4 @@ public class AuthController {
         return ResponseEntity.ok("Usuario eliminado correctamente");
     }
 }
-
 
