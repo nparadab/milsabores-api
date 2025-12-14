@@ -34,10 +34,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
-                // 👥 Usuarios solo ADMIN
-                .requestMatchers("/api/auth/usuarios/**").hasRole("ADMIN")
+                // ✅ Usuarios solo ADMIN (ruta correcta)
+                .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
 
-                // 👁️ Productos y categorías — ahora públicos
+                // 👁️ Productos y categorías — públicos
                 .requestMatchers("/api/productos/**", "/api/categorias/**").permitAll()
 
                 // 📦 Pedidos accesibles por ambos
@@ -65,4 +65,5 @@ public class SecurityConfig {
         return source;
     }
 }
+
 
