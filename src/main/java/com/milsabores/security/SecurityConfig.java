@@ -35,6 +35,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/recuperar").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
+                // ✅ Categorías deben ser públicas para Android
+                .requestMatchers("/api/categorias/**").permitAll()
+
                 // 👑 ADMIN — gestión completa
                 .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/productos/**").hasRole("ADMIN")
@@ -47,10 +50,6 @@ public class SecurityConfig {
 
                 // 👤 CLIENTE — solo ver productos
                 .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
-
-                // 🟦 SUPERVISOR — solo ver productos y categorías
-                .requestMatchers(HttpMethod.GET, "/api/productos/**").hasAnyRole("ADMIN", "VENDEDOR", "CLIENTE", "SUPERVISOR")
-                .requestMatchers("/api/categorias/**").hasAnyRole("ADMIN", "VENDEDOR", "CLIENTE", "SUPERVISOR")
 
                 // 🔐 Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
