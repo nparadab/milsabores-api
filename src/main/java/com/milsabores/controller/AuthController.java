@@ -44,10 +44,19 @@ public class AuthController {
     public ResponseEntity<?> recuperarPassword(@RequestBody Map<String, String> request) {
 
         String email = request.get("email");
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "Email inválido"));
+        }
+
+        // ✅ Normalizar email
+        email = email.trim().toLowerCase();
+
+        // ✅ Buscar ignorando mayúsculas/minúsculas
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmailIgnoreCase(email);
 
         if (usuarioOpt.isEmpty()) {
-            return ResponseEntity.status(404).body("No existe un usuario con ese correo");
+            return ResponseEntity.status(404).body(Map.of("mensaje", "No existe un usuario con ese correo"));
         }
 
         Usuario usuario = usuarioOpt.get();
